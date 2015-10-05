@@ -12,6 +12,12 @@ Brutime is a Node.JS library for scraping data from [Brunel University](https://
 
 ## Usage
 
+### Require brutime
+
+```js
+var BruTime = require('brutime')
+```
+
 ### Create an instance of BruTime with your login/password.
 
 ```js
