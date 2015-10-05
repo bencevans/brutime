@@ -1,0 +1,35 @@
+{
+  "name": "brutime",
+  "version": "0.0.0",
+  "description": "Library for fetching timetabling info for [Brunel](https://brunel.ac.uk) students.",
+  "main": "index.js",
+  "scripts": {
+    "test": "standard && node test.js | tap-spec"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bencevans/brutime.git"
+  },
+  "keywords": [
+    "Brunel",
+    "timetable",
+    "library",
+    "reader"
+  ],
+  "author": "Ben Evans <ben@bensbit.co.uk> (http://bensbit.co.uk)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/bencevans/brutime/issues"
+  },
+  "homepage": "https://github.com/bencevans/brutime#readme",
+  "dependencies": {
+    "cheerio": "^0.19.0",
+    "request": "^2.61.0",
+    "underscore": "^1.8.3"
+  },
+  "devDependencies": {
+    "standard": "^5.2.2",
+    "tap-spec": "^4.1.0",
+    "tape": "^4.2.0"
+  }
+}
