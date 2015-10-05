@@ -4,7 +4,7 @@
   "description": "Library for fetching timetabling info for [Brunel](https://brunel.ac.uk) students.",
   "main": "index.js",
   "scripts": {
-    "test": "standard && node test.js | tap-spec",
+    "test": "standard && nyc node test.js | tap-spec",
     "coverage": "nyc report --reporter=text-lcov | coveralls"
   },
   "repository": {
