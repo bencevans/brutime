@@ -4,7 +4,8 @@
   "description": "Library for fetching timetabling info for [Brunel](https://brunel.ac.uk) students.",
   "main": "index.js",
   "scripts": {
-    "test": "standard && node test.js | tap-spec"
+    "test": "standard && node test.js | tap-spec",
+    "coverage": "nyc report --reporter=text-lcov | coveralls"
   },
   "repository": {
     "type": "git",
@@ -29,6 +30,8 @@
     "underscore": "1.8.3"
   },
   "devDependencies": {
+    "coveralls": "2.11.4",
+    "nyc": "3.2.2",
     "standard": "5.3.1",
     "tap-spec": "4.1.0",
     "tape": "4.2.1"
