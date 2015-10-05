@@ -15,6 +15,8 @@ function BruTime (options) {
   var BASE_URL = 'https://teaching.brunel.ac.uk/SWS-' + (options.year || '1516') + '/'
   var ACTION_URL = BASE_URL + 'default.aspx'
 
+  var self = this
+
   var request = Request.defaults({
     followAllRedirects: true,
     jar: Request.jar()
@@ -54,7 +56,7 @@ function BruTime (options) {
       callback(err, res, body, $)
     })
   }
-  var self = this
+
   // Handles Login if the first request redirects to login page (err, req, res, body, $)
   this._authenticatedAction = function (formData, callback) {
     this._action(formData, function (err, res, body, $) {
