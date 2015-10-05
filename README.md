@@ -22,7 +22,7 @@ var BruTime = require('brutime')
 
 ```js
 var timetable = new BruTime({
-  login: '1309253',
+  login: '1156145',
   password: 'my password'
 })
 ```
