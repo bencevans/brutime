@@ -43,10 +43,9 @@ function BruTime (options) {
 
   // POST Based Requests, Fills in VIEWSTATE etc.
   this._action = function (formData, callback) {
-    request({
+    var req = request({
       method: 'POST',
-      uri: ACTION_URL,
-      form: _.extend(nextFormData, formData)
+      uri: ACTION_URL
     }, function (err, res, body) {
       if (err) {
         return callback(err)
@@ -54,6 +53,19 @@ function BruTime (options) {
       var $ = Cheerio.load(body)
       nextFormData = cheerioFormBodyToRequest($('form').serializeArray())
       callback(err, res, body, $)
+    })
+
+    var form = req.form()
+
+    // Flatten arrays into separate keys and add to form
+    _.each(_.extend(nextFormData, formData), function (value, key) {
+      if (value instanceof Array) {
+        _.each(value, function (value) {
+          form.append(key, value)
+        })
+      } else {
+        form.append(key, value)
+      }
     })
   }
 
@@ -131,6 +143,44 @@ function BruTime (options) {
     //   period: '1-12',
     //   days: '1-7'
     // }
+    self.listMyModules(function (err, myModules) {
+      if (err) {
+        return callback(err)
+      }
+      self._authenticatedAction({
+        tLinkType: 'studentmodules',
+        'dlObject': options.modules || myModules,
+        lbWeeks: options.period || '1-12',
+        lbDays: options.days || '1-7',
+        dlType: 'TextSpreadsheet;swsurl;SWSCUST Object TextSpreadsheet&combined=yes',
+        bGetTimetable: 'View Timetable'
+      }, function (err, res, body, $) {
+        if (err) {
+          return callback(err)
+        }
+
+        const labels = ['activity', 'description', 'start', 'end', 'weeks', 'room', 'staff', 'type']
+        var days = []
+
+        $('table.spreadsheet').each(function (dayNo, table) {
+          days[dayNo] = []
+
+          $(table).find('tr').each(function (rowNo, tr) {
+            if (rowNo === 0) { // Ignore Label Row
+              return
+            }
+
+            days[dayNo][rowNo - 1] = {}
+
+            $(tr).find('td').map(function (colNo, td) {
+              days[dayNo][rowNo - 1][labels[colNo]] = $(td).text()
+            })
+          })
+        })
+
+        callback(null, days)
+      })
+    })
   }
 
   this.listModules = function (options, callback) {

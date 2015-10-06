@@ -100,3 +100,15 @@ test('listing my modules', function (t) {
     t.ok(typeof myModules[0] === 'string', 'module is string')
   })
 })
+
+/**
+* My Modules Timetable
+*/
+
+test('list events from my modules', function (t) {
+  t.plan(2)
+  brutime.getMyModulesTimetable({}, function (err, timetable) {
+    t.error(err)
+    t.equal(timetable.length, 7, '7 days are returned by default')
+  })
+})
