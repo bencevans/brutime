@@ -35,7 +35,7 @@ timetable.listMyModules(function (err, myModules) {
 })
 ```
 
-### TODO: `getMyModulesTimetable()` - List contact hours for your enrolled modules
+### `getMyModulesTimetable()` - List contact hours for your enrolled modules
 
 ```js
 timetable.getMyModulesTimetable({
