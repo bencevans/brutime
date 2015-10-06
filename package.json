@@ -1,6 +1,6 @@
 {
   "name": "brutime",
-  "version": "0.0.0",
+  "version": "1.0.0-0",
   "description": "Library for fetching timetabling info for [Brunel](https://brunel.ac.uk) students.",
   "main": "index.js",
   "scripts": {
