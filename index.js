@@ -138,7 +138,7 @@ function BruTime (options) {
     })
   }
 
-  this.getMyTimetable = function (options, callback) {
+  this.getMyModulesTimetable = function (options, callback) {
     // options = {
     //   period: '1-12',
     //   days: '1-7'
@@ -149,7 +149,7 @@ function BruTime (options) {
       }
       self._authenticatedAction({
         tLinkType: 'studentmodules',
-        'dlObject': myModules,
+        'dlObject': options.modules || myModules,
         lbWeeks: options.period || '1-12',
         lbDays: options.days || '1-7',
         dlType: 'TextSpreadsheet;swsurl;SWSCUST Object TextSpreadsheet&combined=yes',
@@ -158,7 +158,27 @@ function BruTime (options) {
         if (err) {
           return callback(err)
         }
-        callback(null, [[], [], [], [], [], [], []])
+
+        const labels = ['activity', 'description', 'start', 'end', 'weeks', 'room', 'staff', 'type']
+        var days = []
+
+        $('table.spreadsheet').each(function (dayNo, table) {
+          days[dayNo] = []
+
+          $(table).find('tr').each(function (rowNo, tr) {
+            if (rowNo === 0) { // Ignore Label Row
+              return
+            }
+
+            days[dayNo][rowNo - 1] = {}
+
+            $(tr).find('td').map(function (colNo, td) {
+              days[dayNo][rowNo - 1][labels[colNo]] = $(td).text()
+            })
+          })
+        })
+
+        callback(null, days)
       })
     })
   }
