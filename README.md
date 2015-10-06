@@ -48,7 +48,10 @@ timetable.getMyModulesTimetable({
   period: '1-12',
   days: '1-7'
 }, function (err, timetable) {
-  console.log('Monday:')
+  if (err) {
+    return console.error(err)
+  }
+  console.log(timetable)
 })
 ```
 
