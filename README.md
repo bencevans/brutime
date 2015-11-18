@@ -1,33 +1,26 @@
-# Brutime
+# brutime [![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat-square)](https://github.com/feross/standard) [![Travis](https://img.shields.io/travis/bencevans/brutime.svg?style=flat-square)](https://travis-ci.org/bencevans/brutime) [![Coveralls](https://img.shields.io/coveralls/bencevans/brutime.svg?style=flat-square)](https://coveralls.io/github/bencevans/brutime)
 
-[![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat-square)](https://github.com/feross/standard)
-[![Travis](https://img.shields.io/travis/bencevans/brutime.svg?style=flat-square)](https://travis-ci.org/bencevans/brutime)
-[![Coveralls](https://img.shields.io/coveralls/bencevans/brutime.svg?style=flat-square)](https://coveralls.io/github/bencevans/brutime)
-
-Brutime is a Node.JS library for scraping data from [Brunel University](https://brunel.ac.uk)'s timetabling portal.
+Node.js module for scraping data from [Brunel University](https://brunel.ac.uk)'s timetabling portal.
 
 ## Install
 
-    npm install --save brutime
+    $ npm install --save brutime
 
 ## Usage
 
-### Require brutime
+## Instantiate client
 
 ```js
-var BruTime = require('brutime')
-```
+const BruTime = require('brutime')
 
-### Create an instance of BruTime with your login/password.
-
-```js
+// Create an instance of BruTime with your login/password.
 var timetable = new BruTime({
   login: '1156145',
   password: 'my password'
 })
 ```
 
-### `listMyModules()` - List your enrolled modules
+### `.listMyModules()` - List your enrolled modules
 
 ```js
 // List Enrolled Modules
@@ -41,7 +34,7 @@ timetable.listMyModules(function (err, myModules) {
 })
 ```
 
-### `getMyModulesTimetable()` - List contact hours for your enrolled modules
+### `.getMyModulesTimetable()` - List contact hours for your enrolled modules
 
 ```js
 timetable.getMyModulesTimetable({
@@ -58,11 +51,11 @@ timetable.getMyModulesTimetable({
 ## Testing
 
 ```sh
-$ export LOGIN=YOUR_STUDENT_ID
-$ export PASSWORD=YOUR_STUDENT_PASSWORD
+$  export LOGIN=YOUR_STUDENT_ID
+$  export PASSWORD=YOUR_STUDENT_PASSWORD
 $ npm test
 ```
 
 ## Licence
 
-MIT
+MIT © [Ben Evans](http://bensbit.co.uk)
