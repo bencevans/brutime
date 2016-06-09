@@ -56,6 +56,10 @@ $  export PASSWORD=YOUR_STUDENT_PASSWORD
 $ npm test
 ```
 
+## Related
+
+* [bencevans/brugrade](https://github.com/bencevans/brugrade) - Brunel's undergraduate marking/grade bounds dataset and byMark(grade) search.
+
 ## Licence
 
 MIT © [Ben Evans](http://bensbit.co.uk)
