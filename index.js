@@ -12,7 +12,7 @@ function cheerioFormBodyToRequest (cheerioForm) {
 }
 
 function BruTime (options) {
-  var BASE_URL = 'https://teaching.brunel.ac.uk/SWS-' + (options.year || '1516') + '/'
+  var BASE_URL = 'https://teaching.brunel.ac.uk/SWS-' + (options.year || '1718') + '/'
   var ACTION_URL = BASE_URL + 'default.aspx'
 
   var self = this
