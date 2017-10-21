@@ -24,7 +24,7 @@
   },
   "homepage": "https://github.com/bencevans/brutime#readme",
   "dependencies": {
-    "cheerio": "0.19.0",
+    "cheerio": "^0.22.0",
     "debug": "^3.1.0",
     "request": "^2.83.0",
     "underscore": "1.8.3"
