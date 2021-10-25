@@ -109,10 +109,11 @@ export default class Scraper {
     await this.page.focus("#tUserName");
     await this.page.type("#tUserName", username);
 
-    await this.page.waitForSelector("#tUserName");
+    await this.page.waitForSelector("#tPassword");
     await this.page.focus("#tPassword");
     await this.page.type("#tPassword", password);
 
+    await this.page.waitForSelector("#bLogin");
     await this.page.click("#bLogin");
 
     await this.page.waitForNetworkIdle();
