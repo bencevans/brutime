@@ -1,30 +1,28 @@
-var BruTime = require('./')
+import Scraper from "./index.js";
 
-var timetable = new BruTime({
-  login: process.env.LOGIN,
-  password: process.env.PASSWORD
-})
+(async () => {
+  const scraper = new Scraper();
 
-timetable.login(function (err) {
-  if (err) {
-    throw err
-  }
-  console.log('Logged In')
+  console.log("Starting up browser");
+  await scraper.init();
 
-  timetable.listMyModules(function (err, myModules) {
-    if (err) {
-      throw err
-    }
-    console.log('My Modules: ' + myModules.join(', '))
+  console.log("Logging in to timetabling");
+  await scraper.login(process.env.BRUNEL_ID, process.env.BRUNEL_PASSWORD);
 
-    timetable.getMyTimetable({
-      period: 't', // t = this week, n = next week, 3 = or any number is the week number, 1-12 = term 1, 1-52 = all terms
-      days: '1-5' // 1-5 = Monday to Friday, 1-7 = Monday to Sunday, 1 = Monday, 2 = Tuesday ...
-    }, function (err, timetable) {
-      if (err) {
-        throw err
-      }
-      console.log(timetable)
-    })
-  })
-})
+  console.log("Finding course options");
+  const courseOptions = await scraper.getCourseOptions();
+  console.log(courseOptions);
+
+  console.log("Finding course options with 'Computer' search");
+  const computerCourseOptions = await scraper.getCourseOptions({
+    courseSearchString: "Computer",
+  });
+  console.log(computerCourseOptions);
+
+  console.log("Finding foundation course options");
+  const foundationCourseOptions = await scraper.getCourseOptions({
+    levelId: "1",
+  });
+  console.log(foundationCourseOptions);
+  await scraper.close();
+})();

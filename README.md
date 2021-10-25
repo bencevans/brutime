@@ -1,6 +1,8 @@
-# brutime [![js-standard-style](https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat-square)](https://github.com/feross/standard) [![Travis](https://img.shields.io/travis/bencevans/brutime.svg?style=flat-square)](https://travis-ci.org/bencevans/brutime) [![Coveralls](https://img.shields.io/coveralls/bencevans/brutime.svg?style=flat-square)](https://coveralls.io/github/bencevans/brutime)
+# brutime
 
 Node.js module for scraping data from [Brunel University](https://brunel.ac.uk)'s timetabling portal.
+
+⚠️ This README is out of date and shall be updated soon once the puppeteer rewrites are complete.
 
 ## Install
 
@@ -11,13 +13,13 @@ Node.js module for scraping data from [Brunel University](https://brunel.ac.uk)'
 ## Instantiate client
 
 ```js
-const BruTime = require('brutime')
+const BruTime = require("brutime");
 
 // Create an instance of BruTime with your login/password.
 var timetable = new BruTime({
-  login: '1156145',
-  password: 'my password'
-})
+  login: "1156145",
+  password: "my password",
+});
 ```
 
 ### `.listMyModules()` - List your enrolled modules
@@ -26,26 +28,29 @@ var timetable = new BruTime({
 // List Enrolled Modules
 timetable.listMyModules(function (err, myModules) {
   if (err) {
-    throw err
+    throw err;
   }
   // myModules === ['CS2001', 'CS2002', 'CS2003']
-  console.log('My Modules: ' + myModules.join(', '))
+  console.log("My Modules: " + myModules.join(", "));
   // Prints: CS2001, CS2002, CS2003
-})
+});
 ```
 
 ### `.getMyModulesTimetable()` - List contact hours for your enrolled modules
 
 ```js
-timetable.getMyModulesTimetable({
-  period: '1-12',
-  days: '1-7'
-}, function (err, timetable) {
-  if (err) {
-    return console.error(err)
+timetable.getMyModulesTimetable(
+  {
+    period: "1-12",
+    days: "1-7",
+  },
+  function (err, timetable) {
+    if (err) {
+      return console.error(err);
+    }
+    console.log(timetable);
   }
-  console.log(timetable)
-})
+);
 ```
 
 ## Testing
@@ -58,7 +63,7 @@ $ npm test
 
 ## Related
 
-* [bencevans/brugrade](https://github.com/bencevans/brugrade) - Brunel's undergraduate marking/grade bounds dataset and byMark(grade) search.
+- [bencevans/brugrade](https://github.com/bencevans/brugrade) - Brunel's undergraduate marking/grade bounds dataset and byMark(grade) search.
 
 ## Licence
 

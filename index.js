@@ -1,204 +1,172 @@
-var Request = require('request')
-var Cheerio = require('cheerio')
-var debug = require('debug')('brutime')
-var _ = require('underscore')
+import puppeteer from "puppeteer";
+import { LOGIN_REQUIRED, INVALID_CREDENTIALS } from "./errors.js";
 
-function cheerioFormBodyToRequest (cheerioForm) {
-  var output = {}
-  cheerioForm.forEach(function (item) {
-    output[item.name] = item.value
-  })
-  return output
-}
+export default class Scraper {
+  constructor() {
+    this.baseUrl = "https://teaching.brunel.ac.uk/teaching/SWS-2122/";
+    this.loginUrl =
+      "https://teaching.brunel.ac.uk/teaching/SWS-2122/Login.aspx";
+    this.defaultUrl =
+      "https://teaching.brunel.ac.uk/teaching/SWS-2122/default.aspx";
 
-function BruTime (options) {
-  var BASE_URL = 'https://teaching.brunel.ac.uk/SWS-' + (options.year || '1718') + '/'
-  var ACTION_URL = BASE_URL + 'default.aspx'
-
-  var self = this
-
-  var request = Request.defaults({
-    followAllRedirects: true,
-    jar: Request.jar()
-  })
-
-  var nextFormData = {}
-
-  /*
-  * Options Validation
-  */
-
-  // Student ID
-  if (typeof options.login !== 'string' || !options.login) {
-    throw new Error('login required')
-  }
-  // Password
-  if (typeof options.password !== 'string' || !options.password) {
-    throw new Error('password required')
+    this.browser = null;
+    this.page = null;
   }
 
-  /*
-  * Private (Low-Level) Methods
-  */
-
-  // POST Based Requests, Fills in VIEWSTATE etc.
-  this._action = function (formData, callback) {
-    var req = request({
-      method: 'POST',
-      uri: ACTION_URL
-    }, function (err, res, body) {
-      if (err) {
-        return callback(err)
-      }
-      var $ = Cheerio.load(body)
-      nextFormData = cheerioFormBodyToRequest($('form').serializeArray())
-      callback(err, res, body, $)
-    })
-
-    var form = req.form()
-
-    // Flatten arrays into separate keys and add to form
-    _.each(_.extend(nextFormData, formData), function (value, key) {
-      if (value instanceof Array) {
-        _.each(value, function (value) {
-          form.append(key, value)
-        })
-      } else {
-        form.append(key, value)
-      }
-    })
+  /**
+   * Initialise the browser ready for scraping
+   */
+  async init(puppeteerOptions = {}) {
+    this.browser = await puppeteer.launch(puppeteerOptions);
+    this.page = await this.browser.newPage();
   }
 
-  // Handles Login if the first request redirects to login page (err, req, res, body, $)
-  this._authenticatedAction = function (formData, callback) {
-    this._action(formData, function (err, res, body, $) {
-      if (err) {
-        return callback(err)
-      }
-      if (res.request.path.match(/login\.aspx/)) {
-        self.login(function (err) {
-          if (err) {
-            return callback(err)
-          }
-          self._authenticatedAction(formData, callback)
-        })
-      } else {
-        callback(null, res, body, $)
-      }
-    })
+  /**
+   * Ensure that the browser has been initialised
+   */
+  async _ensureInitialised() {
+    if (!this.browser) {
+      await this.init();
+    }
   }
 
-  /*
-  * Public Methods
-  */
+  /**
+   * Ensure that the browser has been initialised and that the user is logged in
+   */
+  async ensureInitialisedAndAuthenticated() {
+    await this._ensureInitialised();
 
-  this.login = function (callback) {
-    request(BASE_URL + 'login.aspx', function (req, res, body) {
-      if (res.request.path.match(/\/login.aspx/)) {
-        debug('Authentication Required')
-      }
+    await this.page.goto(this.baseUrl);
 
-      var $ = Cheerio.load(body)
-      var formData = cheerioFormBodyToRequest($('form').serializeArray())
-      debug('formData: ', formData)
+    if (this.page.url().includes("Login")) {
+      throw LOGIN_REQUIRED;
+    }
 
-      request({
-        method: 'POST',
-        uri: BASE_URL + 'login.aspx',
-        form: _.extend(formData, {
-          tUserName: options.login,
-          tPassword: options.password,
-          bLogin: 'Login'
-        })
-      }, function (err, res, body) {
-        if (err) {
-          return callback(err)
-        }
-        if (res.request.path.match(/\/login.aspx/)) {
-          return callback(new Error('invalid login/password'))
-        }
-        var $ = Cheerio.load(body)
-        nextFormData = cheerioFormBodyToRequest($('form').serializeArray())
-        callback()
-      })
-    })
+    return true;
   }
 
-  this.listMyModules = function (callback) {
-    this._authenticatedAction({
-      __EVENTTARGET: 'LinkBtn_studentmodules'
-    }, function (err, res, body, $) {
-      if (err) {
-        return callback(err)
-      }
-      var myModules = $('select[name="dlObject"] option').toArray().map(function (moduleOptionEl) {
-        return moduleOptionEl.attribs.value
-      })
-      callback(null, myModules)
-    })
-  }
+  async getCourseOptions(opts = { levelId: null, courseSearchString: null }) {
+    if (!opts) opts = {};
+    if (!opts.levelId) opts.levelId = null;
+    if (!opts.courseSearchString) opts.courseSearchString = null;
 
-  this.getMyModulesTimetable = function (options, callback) {
-    // options = {
-    //   period: '1-12',
-    //   days: '1-7'
-    // }
-    self.listMyModules(function (err, myModules) {
-      if (err) {
-        return callback(err)
-      }
-      self._authenticatedAction({
-        tLinkType: 'studentmodules',
-        'dlObject': options.modules || myModules,
-        lbWeeks: options.period || '1-12',
-        lbDays: options.days || '1-7',
-        dlType: 'TextSpreadsheet;swsurl;SWSCUST Object TextSpreadsheet&combined=yes',
-        bGetTimetable: 'View Timetable'
-      }, function (err, res, body, $) {
-        if (err) {
-          return callback(err)
-        }
+    await this.ensureInitialisedAndAuthenticated();
 
-        const labels = ['activity', 'description', 'start', 'end', 'weeks', 'room', 'staff', 'type']
-        var days = []
+    await this.page.waitForSelector("#LinkBtn_pos");
+    await this.page.click("#LinkBtn_pos");
 
-        $('table.spreadsheet').each(function (dayNo, table) {
-          days[dayNo] = []
+    if (opts.levelId) {
+      await this.page.waitForSelector("#dlFilter");
+      await this.page.select("#dlFilter", opts.levelId);
+      await this.page.waitForNetworkIdle();
+    }
 
-          $(table).find('tr').each(function (rowNo, tr) {
-            if (rowNo === 0) { // Ignore Label Row
-              return
-            }
+    if (opts.courseSearchString) {
+      await this.page.waitForSelector("#tWildcard");
+      await this.page.type("#tWildcard", opts.courseSearchString);
+      await this.page.click("#bWildcard");
+    }
 
-            days[dayNo][rowNo - 1] = {}
+    await this.page.waitForSelector("#dlObject");
 
-            $(tr).find('td').map(function (colNo, td) {
-              days[dayNo][rowNo - 1][labels[colNo]] = $(td).text()
-            })
+    return await this.page.evaluate(() => {
+      const courseList = document.querySelector("#dlObject");
+
+      return {
+        levels: Array.from(document.getElementById("dlFilter").children)
+          .map((level) => {
+            return {
+              name: level.textContent,
+              id: level.getAttribute("value"),
+            };
           })
-        })
-
-        callback(null, days)
-      })
-    })
+          .filter((level) => level.id !== ""),
+        courses: Array.from(courseList.children).map((courseOption) => {
+          return {
+            id: courseOption.value,
+            name: courseOption.textContent,
+          };
+        }),
+      };
+    });
   }
 
-  this.listModules = function (options, callback) {
-    // options = {
-    //   level: '2', // 0 = Foundation, 1 = Level 1, 2 = Level 2, 2p = Placement, 3 = Level 3 ...
-    //   query: 'CS' // Search Query Filter
-    // }
+  /**
+   * Log in to the https://teaching.brunel.ac.uk website
+   * @param {String} username Students: student number (eg 201234), Staff: network username (eg hlstikb)
+   * @param {*} password network password
+   */
+  async login(username, password) {
+    await this._ensureInitialised();
+
+    await this.page.goto(this.baseUrl);
+
+    await this.page.waitForSelector("#tUserName");
+    await this.page.focus("#tUserName");
+    await this.page.type("#tUserName", username);
+
+    await this.page.waitForSelector("#tUserName");
+    await this.page.focus("#tPassword");
+    await this.page.type("#tPassword", password);
+
+    await this.page.click("#bLogin");
+
+    await this.page.waitForNetworkIdle();
+
+    if (this.page.url().toLowerCase().includes("login")) {
+      throw INVALID_CREDENTIALS;
+    }
   }
 
-  this.getModulesTimetable = function (options, callback) {
-    // options = {
-    //   modules: ['CS2001'],
-    //   period: '1-12',
-    //   days: '1-7'
-    // }
+  /**
+   * List all courses
+   * @returns {Promise<Array<{id: String, name: String}>>}
+   */
+  async listCourses() {
+    await this.ensureInitialisedAndAuthenticated();
+
+    await this.page.waitForSelector("#LinkBtn_pos");
+    await this.page.click("#LinkBtn_pos");
+
+    await this.page.waitForSelector("#dlObject");
+
+    return await this.page.evaluate(() => {
+      const courseList = document.querySelector("#dlObject");
+
+      return Array.from(courseList.children).map((courseOption) => {
+        return {
+          id: courseOption.value,
+          name: courseOption.textContent,
+        };
+      });
+    });
   }
 
-  return this
+  /**
+   * List all rooms
+   * @returns {Promise<Array<{id: String, name: String}>>}
+   */
+  async listRooms() {
+    await this.ensureInitialisedAndAuthenticated();
+
+    await this.page.waitForSelector("#LinkBtn_locationsbyzone");
+    await this.page.click("#LinkBtn_locationsbyzone");
+
+    await this.page.waitForSelector("#dlObject");
+
+    return await this.page.evaluate(() => {
+      const courseList = document.querySelector("#dlObject");
+
+      return Array.from(courseList.children).map((courseOption) => {
+        return {
+          id: courseOption.value,
+          name: courseOption.textContent,
+        };
+      });
+    });
+  }
+
+  async close() {
+    await this.browser.close();
+  }
 }
-
-module.exports = BruTime
