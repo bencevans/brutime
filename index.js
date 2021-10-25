@@ -16,7 +16,11 @@ export default class Scraper {
   /**
    * Initialise the browser ready for scraping
    */
-  async init(puppeteerOptions = {}) {
+  async init(
+    puppeteerOptions = {
+      headless: false,
+    }
+  ) {
     this.browser = await puppeteer.launch(puppeteerOptions);
     this.page = await this.browser.newPage();
   }
