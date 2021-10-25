@@ -118,54 +118,6 @@ export default class Scraper {
     }
   }
 
-  /**
-   * List all courses
-   * @returns {Promise<Array<{id: String, name: String}>>}
-   */
-  async listCourses() {
-    await this.ensureInitialisedAndAuthenticated();
-
-    await this.page.waitForSelector("#LinkBtn_pos");
-    await this.page.click("#LinkBtn_pos");
-
-    await this.page.waitForSelector("#dlObject");
-
-    return await this.page.evaluate(() => {
-      const courseList = document.querySelector("#dlObject");
-
-      return Array.from(courseList.children).map((courseOption) => {
-        return {
-          id: courseOption.value,
-          name: courseOption.textContent,
-        };
-      });
-    });
-  }
-
-  /**
-   * List all rooms
-   * @returns {Promise<Array<{id: String, name: String}>>}
-   */
-  async listRooms() {
-    await this.ensureInitialisedAndAuthenticated();
-
-    await this.page.waitForSelector("#LinkBtn_locationsbyzone");
-    await this.page.click("#LinkBtn_locationsbyzone");
-
-    await this.page.waitForSelector("#dlObject");
-
-    return await this.page.evaluate(() => {
-      const courseList = document.querySelector("#dlObject");
-
-      return Array.from(courseList.children).map((courseOption) => {
-        return {
-          id: courseOption.value,
-          name: courseOption.textContent,
-        };
-      });
-    });
-  }
-
   async close() {
     await this.browser.close();
   }
