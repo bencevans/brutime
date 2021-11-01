@@ -3,6 +3,7 @@ import {
   LOGIN_REQUIRED,
   INVALID_CREDENTIALS,
   NOT_IMPLIMENTED,
+  NO_COURSES_SELECTED,
 } from "./errors.js";
 
 export default class Scraper {
@@ -146,11 +147,74 @@ export default class Scraper {
             name: courseOption.textContent,
           };
         }),
+        periods: Array.from(document.getElementById("lbWeeks").children)
+          .map((period) => {
+            return {
+              id: period.value,
+              name: period.textContent,
+            };
+          })
+          .filter((period) => period.id !== ""),
+        days: Array.from(document.getElementById("lbDays").children)
+          .map((day) => {
+            return {
+              id: day.value,
+              name: day.textContent,
+            };
+          })
+          .filter((day) => day.id !== ""),
       };
     });
   }
 
-  async getCourseTimetable() {
+  /**
+   * Retreive a timetable for one or more courses.
+   * @param {Object} opts Object containing a list of courseIds, periodIds and
+   * dayIds identifying the timetable to retrieve. These IDs can be found by calling `getCourseOptions()`.
+   */
+  async getCourseTimetable(
+    opts = { courseIds: [], periodId: "1-51", daysId: "1-7" }
+  ) {
+    if (!opts) opts = {};
+    if (!opts.courseIds) opts.courseIds = [];
+    if (!opts.periodId) opts.periodId = "1-51";
+    if (!opts.daysId) opts.daysId = "1-7";
+
+    if (opts.courseIds.length === 0) {
+      throw NO_COURSES_SELECTED;
+    }
+
+    if (opts.courseIds.length > 8) {
+      throw TOO_MANY_COURSES;
+    }
+
+    await this._ensureInitialisedAndAuthenticated();
+
+    // Navigate to Course Timetable Page
+    await this.page.waitForNetworkIdle();
+    await this.page.waitForSelector("#LinkBtn_pos");
+    await this.page.click("#LinkBtn_pos");
+
+    // Select Courses
+    await this.page.waitForNetworkIdle();
+    await this.page.waitForSelector("#dlObject");
+    await this.page.select("#dlObject", ...opts.courseIds);
+
+    // Select Period
+    await this.page.waitForNetworkIdle();
+    await this.page.waitForSelector("#lbWeeks");
+    await this.page.select("#lbWeeks", opts.periodId);
+
+    // Select Days
+    await this.page.waitForNetworkIdle();
+    await this.page.waitForSelector("#lbDays");
+    await this.page.select("#lbDays", opts.daysId);
+
+    // Click Submit
+    await this.page.waitForNetworkIdle();
+    await this.page.waitForSelector("#bSubmit");
+    await this.page.click("#bSubmit");
+
     throw NOT_IMPLIMENTED;
   }
 
