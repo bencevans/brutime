@@ -35,6 +35,8 @@ await bruTime.init({
 - Students: Should use your Student ID and network password.
 - Staff: Should use your network username and password.
 
+Both the student id/staff login and password should be strings.
+
 ```js
 try {
   await bruTime.login(studentId, password);
