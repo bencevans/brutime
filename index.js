@@ -24,7 +24,7 @@ export default class Scraper {
    */
   async init(
     puppeteerOptions = {
-      headless: false,
+      headless: true,
     }
   ) {
     this.browser = await puppeteer.launch(puppeteerOptions);

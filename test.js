@@ -2,6 +2,11 @@ import test from "tape";
 import { INVALID_CREDENTIALS } from "./errors.js";
 import Scraper from "./index.js";
 
+const puppeteerOptions = {
+  headless: false,
+  devtools: true,
+};
+
 /**
  * Authentication Tests
  */
@@ -9,7 +14,7 @@ import Scraper from "./index.js";
 test("create an instance", async function (t) {
   t.plan(1);
   const scraper = new Scraper();
-  await scraper.init();
+  await scraper.init(puppeteerOptions);
   t.ok(scraper._ensureInitialised());
   await scraper.close();
 });
@@ -17,7 +22,7 @@ test("create an instance", async function (t) {
 test("login with invalid login", async (t) => {
   t.plan(1);
   const scraper = new Scraper();
-  await scraper.init();
+  await scraper.init(puppeteerOptions);
 
   try {
     await scraper.login("invalid", "invalid");
@@ -35,7 +40,7 @@ test("login with invalid login", async (t) => {
 test("login with valid credentials", async (t) => {
   t.plan(1);
   const scraper = new Scraper();
-  await scraper.init();
+  await scraper.init(puppeteerOptions);
   await scraper.login(process.env.BRUNEL_ID, process.env.BRUNEL_PASSWORD);
   t.ok(await scraper._ensureInitialisedAndAuthenticated());
   await scraper.close();
@@ -43,7 +48,7 @@ test("login with valid credentials", async (t) => {
 
 test("Get Course Timetable Options", async (t) => {
   const scraper = new Scraper();
-  await scraper.init();
+  await scraper.init(puppeteerOptions);
   await scraper.login(process.env.BRUNEL_ID, process.env.BRUNEL_PASSWORD);
   const options = await scraper.getCourseOptions();
 
