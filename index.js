@@ -212,8 +212,13 @@ export default class Scraper {
 
     // Click Submit
     await this.page.waitForNetworkIdle();
-    await this.page.waitForSelector("#bSubmit");
-    await this.page.click("#bSubmit");
+    await this.page.waitForSelector("#bGetTimetable");
+    await this.page.click("#bGetTimetable");
+
+    // Wait for timetable to load
+    await this.page.waitForNetworkIdle();
+
+    // TODO: Parse Timetable. Reuse code from initial implementation?
 
     throw NOT_IMPLIMENTED;
   }

@@ -24,5 +24,11 @@ import Scraper from "./index.js";
     levelId: "1",
   });
   console.log(foundationCourseOptions);
+
+  const timetable = await scraper.getCourseTimetable({
+    courseIds: [foundationCourseOptions.courses[0].id],
+  });
+  console.log(timetable);
+
   await scraper.close();
 })();
