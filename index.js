@@ -4,6 +4,7 @@ import {
   INVALID_CREDENTIALS,
   NOT_IMPLIMENTED,
   NO_COURSES_SELECTED,
+  TOO_MANY_COURSES,
 } from "./errors.js";
 
 export default class Scraper {
