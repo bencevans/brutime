@@ -59,6 +59,12 @@ $  export BRUNEL_PASSWORD=YOUR_STUDENT_PASSWORD
 $ npm test
 ```
 
+## Related
+
+- [bencevans/parse-weeks](https://github.com/bencevans/parse-weeks) - Parse a comma separated list of ranges and numbers into an array of all numbers covered.
+- [bencevans/brucal](https://github.com/bencevans/brucal) - (deprecated) - iCal Web Service for Brunel Timetables. Automatically add your Brunel timetable to Google Calendar, GNOME Calendar or any other calendar application providing support for Web iCal.
+- ... [Add Your Project](https://github.com/bencevans/brutime/edit/main/README.md)
+
 ## Licence
 
 MIT © [Ben Evans](http://bensbit.co.uk)
