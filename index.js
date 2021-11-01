@@ -112,15 +112,18 @@ export default class Scraper {
 
     await this._ensureInitialisedAndAuthenticated();
 
+    // Navigate to the course options page
     await this.page.waitForSelector("#LinkBtn_pos");
     await this.page.click("#LinkBtn_pos");
 
+    // Filter to level if specified
     if (opts.levelId) {
       await this.page.waitForSelector("#dlFilter");
       await this.page.select("#dlFilter", opts.levelId);
       await this.page.waitForNetworkIdle();
     }
 
+    // Filter to search string if specified
     if (opts.courseSearchString) {
       await this.page.waitForSelector("#tWildcard");
       await this.page.type("#tWildcard", opts.courseSearchString);
@@ -128,10 +131,12 @@ export default class Scraper {
     }
 
     await this.page.waitForNetworkIdle();
+    await this.page.waitForSelector("#dlObject");
+    await this.page.waitForSelector("#dlFilter");
+    await this.page.waitForSelector("#lbWeeks");
+    await this.page.waitForSelector("#lbDays");
 
     return await this.page.evaluate(() => {
-      const courseList = document.querySelector("#dlObject");
-
       return {
         levels: Array.from(document.getElementById("dlFilter").children)
           .map((level) => {
@@ -141,12 +146,14 @@ export default class Scraper {
             };
           })
           .filter((level) => level.id !== ""),
-        courses: Array.from(courseList.children).map((courseOption) => {
-          return {
-            id: courseOption.value,
-            name: courseOption.textContent,
-          };
-        }),
+        courses: Array.from(document.querySelector("#dlObject")).map(
+          (courseOption) => {
+            return {
+              id: courseOption.value,
+              name: courseOption.textContent,
+            };
+          }
+        ),
         periods: Array.from(document.getElementById("lbWeeks").children)
           .map((period) => {
             return {
@@ -210,6 +217,14 @@ export default class Scraper {
     await this.page.waitForSelector("#lbDays");
     await this.page.select("#lbDays", opts.daysId);
 
+    // Select List Timetable Report Type
+    await this.page.waitForNetworkIdle();
+    await this.page.waitForSelector("#dlType");
+    await this.page.select(
+      "#dlType",
+      "TextSpreadsheet;swsurl;SWSCUST Object TSS-Footer"
+    );
+
     // Click Submit
     await this.page.waitForNetworkIdle();
     await this.page.waitForSelector("#bGetTimetable");
@@ -218,9 +233,32 @@ export default class Scraper {
     // Wait for timetable to load
     await this.page.waitForNetworkIdle();
 
-    // TODO: Parse Timetable. Reuse code from initial implementation?
+    // Parse Timetable
+    return await this.page.evaluate(() => {
+      const tables = document.querySelectorAll("table.spreadsheet");
+      const days = [];
 
-    throw NOT_IMPLIMENTED;
+      for (const table of tables) {
+        const rows = table.querySelectorAll("tr");
+        const day = [];
+
+        for (const row of rows) {
+          if (row.classList.contains("columnTitles")) {
+            continue;
+          }
+
+          day.push(
+            Array.from(row.querySelectorAll("td")).map((cell) => {
+              return cell.textContent;
+            })
+          );
+        }
+
+        days.push(day);
+      }
+
+      return days;
+    });
   }
 
   async getModuleOptions() {
