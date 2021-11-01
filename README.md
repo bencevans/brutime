@@ -10,60 +10,54 @@ Node.js module for scraping data from [Brunel University](https://brunel.ac.uk)'
 
 ## Usage
 
-## Instantiate client
+### Import BruTime
 
 ```js
-const BruTime = require("brutime");
+import BruTime from "brutime";
+```
 
-// Create an instance of BruTime with your login/password.
-var timetable = new BruTime({
-  login: "1156145",
-  password: "my password",
+### Create an Instance
+
+```js
+const bruTime = new BruTime();
+
+// Creates an instance of puppeteer/chromium
+await bruTime.init();
+
+// You can also pass in a puppeteer options object for example the following
+// to show the browser window and enable devtools.
+await bruTime.init({
+  headless: false,
+  devtools: true,
 });
 ```
 
-### `.listMyModules()` - List your enrolled modules
+### Login
+
+- Students: Should use your Student ID and network password.
+- Staff: Should use your network username and password.
 
 ```js
-// List Enrolled Modules
-timetable.listMyModules(function (err, myModules) {
-  if (err) {
-    throw err;
-  }
-  // myModules === ['CS2001', 'CS2002', 'CS2003']
-  console.log("My Modules: " + myModules.join(", "));
-  // Prints: CS2001, CS2002, CS2003
-});
+try {
+  await bruTime.login(studentId, password);
+} catch (err) {
+  console.error(err);
+}
 ```
 
-### `.getMyModulesTimetable()` - List contact hours for your enrolled modules
+### Course Timetable
 
-```js
-timetable.getMyModulesTimetable(
-  {
-    period: "1-12",
-    days: "1-7",
-  },
-  function (err, timetable) {
-    if (err) {
-      return console.error(err);
-    }
-    console.log(timetable);
-  }
-);
-```
+#### Get Course Timetable Options
+
+#### Get Course Timetable
 
 ## Testing
 
 ```sh
-$  export LOGIN=YOUR_STUDENT_ID
-$  export PASSWORD=YOUR_STUDENT_PASSWORD
+$  export BRUNEL_ID=YOUR_STUDENT_ID
+$  export BRUNEL_PASSWORD=YOUR_STUDENT_PASSWORD
 $ npm test
 ```
-
-## Related
-
-- [bencevans/brugrade](https://github.com/bencevans/brugrade) - Brunel's undergraduate marking/grade bounds dataset and byMark(grade) search.
 
 ## Licence
 
