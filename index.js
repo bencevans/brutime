@@ -127,7 +127,7 @@ export default class Scraper {
       await this.page.click("#bWildcard");
     }
 
-    await this.page.waitForSelector("#dlObject");
+    await this.page.waitForNetworkIdle();
 
     return await this.page.evaluate(() => {
       const courseList = document.querySelector("#dlObject");

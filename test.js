@@ -37,7 +37,7 @@ test("login with valid credentials", async (t) => {
   const scraper = new Scraper();
   await scraper.init();
   await scraper.login(process.env.BRUNEL_ID, process.env.BRUNEL_PASSWORD);
-  t.ok(await scraper.ensureInitialisedAndAuthenticated());
+  t.ok(await scraper._ensureInitialisedAndAuthenticated());
   await scraper.close();
 });
 
