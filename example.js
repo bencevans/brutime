@@ -38,7 +38,23 @@ import Scraper from "./index.js";
   const timetable = await scraper.getCourseTimetable({
     courseIds: [computerScienceLevel2Options.courses[0].id],
   });
-  console.log(timetable);
+
+  const days = [
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+    "Sunday",
+  ];
+  for (const i in timetable) {
+    console.log();
+    console.log(days[i]);
+    for (const session of timetable[i]) {
+      console.log(JSON.stringify(session));
+    }
+  }
 
   await scraper.close();
 })();
