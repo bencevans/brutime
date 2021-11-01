@@ -2,11 +2,9 @@
 
 Node.js module for scraping data from [Brunel University](https://brunel.ac.uk)'s timetabling portal.
 
-⚠️ This README is out of date and shall be updated soon once the puppeteer rewrites are complete.
-
 ## Install
 
-    $ npm install --save brutime
+    $ npm install --save github:bencevans/brutime
 
 ## Usage
 
@@ -49,7 +47,11 @@ try {
 
 #### Get Course Timetable Options
 
+    TODO: Look in example.js in the meantime.
+
 #### Get Course Timetable
+
+    TODO: Look in example.js in the meantime.
 
 ## Testing
 
