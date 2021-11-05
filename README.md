@@ -4,7 +4,13 @@ Node.js module for scraping data from [Brunel University](https://brunel.ac.uk)'
 
 ## Install
 
-    $ npm install --save github:bencevans/brutime
+```sh
+$ yarn add brutime@bencevans/brutime
+
+# or
+
+$ npm install --save github:bencevans/brutime
+```
 
 ## Usage
 
